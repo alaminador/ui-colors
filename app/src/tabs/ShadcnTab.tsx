@@ -44,7 +44,7 @@ export function ShadcnTab() {
   const onAccent = contrastText(accent);
 
   return (
-    <div className="shadcn" style={{ background: hex("neutral", 950), color: "#fff" }}>
+    <div className="shadcn" style={{ background: "var(--ex-bg)", color: "var(--ex-ink)" }}>
       <div className="shadcn-cols">
         <div className="shadcn-col">
           <div className="sh-card sh-hero">
@@ -160,7 +160,7 @@ export function ShadcnTab() {
                 style={
                   index === 0
                     ? { background: accent, color: onAccent }
-                    : { border: "1px solid rgba(255,255,255,0.16)" }
+                    : { border: "1px solid var(--ex-line-strong)" }
                 }
               >
                 <Icon icon={Loading03Icon} size={13} /> {chip}
@@ -344,7 +344,7 @@ export function ShadcnTab() {
                 <strong>Virtual Machine</strong>
                 <em>Access a VM configured cluster to run workloads. (Coming soon)</em>
               </div>
-              <span className="radio" style={{ borderColor: "rgba(255,255,255,0.3)" }} />
+              <span className="radio" style={{ borderColor: "var(--ex-line-strong)" }} />
             </div>
           </div>
 

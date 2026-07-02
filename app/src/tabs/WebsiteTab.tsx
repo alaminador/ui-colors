@@ -15,7 +15,7 @@ export function WebsiteTab() {
   const primaryBtnText = contrastText(hex("primary", 500));
 
   return (
-    <div className="website" style={{ background: hex("neutral", 950), color: "#ffffff" }}>
+    <div className="website" style={{ background: "var(--ex-bg)", color: "var(--ex-ink)" }}>
       <nav className="site-nav">
         <Wordmark color={hex("primary", 400)} />
         <div className="nav-links">
@@ -73,7 +73,7 @@ export function WebsiteTab() {
         <h2>Power Up Your<br />Financial Control</h2>
         <p className="section-sub">Take charge with practical tools that help you categorize and track your way to better financial decisions.</p>
         <div className="grid grid-3">
-          <div className="feature-card" style={{ background: hex("neutral", 900) }}>
+          <div className="feature-card" style={{ background: "var(--ex-panel)" }}>
             <div className="feature-visual">
               {["Groceries", "Household", "Travel"].map((row, index) => (
                 <div key={row} className="feature-row" style={{ background: hex("primary", 800 - index * 100), color: "#fff" }}>
@@ -97,13 +97,13 @@ export function WebsiteTab() {
             <h3>24/7 Chat Support</h3>
             <p>Get instant answers and help anytime with 24/7 chat support right at your fingertips.</p>
           </div>
-          <div className="feature-card" style={{ background: hex("neutral", 900) }}>
+          <div className="feature-card" style={{ background: "var(--ex-panel)" }}>
             <div className="feature-visual">
-              <div className="mini-stat" style={{ background: hex("neutral", 800) }}>
+              <div className="mini-stat" style={{ background: "var(--ex-panel-2)" }}>
                 Expenses <strong>$15,989</strong>
                 <span className="mini-bar" style={{ background: hex("primary", 400) }} />
               </div>
-              <div className="mini-stat" style={{ background: hex("neutral", 800) }}>
+              <div className="mini-stat" style={{ background: "var(--ex-panel-2)" }}>
                 Savings <strong>$12,543</strong>
                 <span className="mini-bar" style={{ background: hex("secondary", 400), width: "42%" }} />
               </div>
@@ -135,7 +135,7 @@ export function WebsiteTab() {
         <h2>Your questions answered</h2>
         <div className="faq-list">
           {faqs.map((question) => (
-            <div key={question} className="faq-row" style={{ background: hex("neutral", 900) }}>
+            <div key={question} className="faq-row" style={{ background: "var(--ex-panel)" }}>
               {question}
               <span style={{ color: hex("primary", 400) }}>+</span>
             </div>
@@ -190,7 +190,7 @@ export function WebsiteTab() {
         <button className="btn-md" style={{ background: hex("primary", 600), color: contrastText(hex("primary", 600)) }}>Get started</button>
       </section>
 
-      <footer className="site-footer-mock" style={{ borderColor: hex("neutral", 800) }}>
+      <footer className="site-footer-mock" style={{ borderColor: "var(--ex-line)" }}>
         <Wordmark color={hex("primary", 400)} />
         <div className="footer-cols">
           {[

@@ -1,5 +1,5 @@
 import { FavouriteIcon } from "@hugeicons/core-free-icons";
-import { contrastText } from "../lib/color";
+import { apcaLc, contrastText } from "../lib/color";
 import { Palettes, RoleKey } from "../lib/palette";
 import { ModalKey } from "../App";
 import { Icon } from "./Icon";
@@ -34,19 +34,27 @@ export function Header({ palettes, activeRole, onOpenModal, onCopy, onSave }: He
         </div>
       </div>
       <div className="swatch-strip">
-        {palette.colors.map(({ stop, hex }) => (
-          <button
-            key={stop}
-            className="swatch"
-            style={{ background: hex, color: contrastText(hex) }}
-            onClick={() => onCopy(hex, `${hex.toUpperCase()} copied`)}
-            title={`Copy ${hex}`}
-          >
-            {stop === palette.anchor && <span className="swatch-anchor" />}
-            <span className="swatch-stop">{stop}</span>
-            <span className="swatch-hex">{hex.replace("#", "").toUpperCase()}</span>
-          </button>
-        ))}
+        {palette.colors.map(({ stop, hex }) => {
+          const lcWhite = Math.round(Math.abs(apcaLc("#ffffff", hex)));
+          const lcBlack = Math.round(Math.abs(apcaLc("#000000", hex)));
+          return (
+            <button
+              key={stop}
+              className="swatch"
+              style={{ background: hex, color: contrastText(hex) }}
+              onClick={() => onCopy(hex, `${hex.toUpperCase()} copied`)}
+              title={`Copy ${hex} · APCA white text ${lcWhite}, black text ${lcBlack} (60+ = body text)`}
+            >
+              {stop === palette.anchor && <span className="swatch-anchor" />}
+              <span className="swatch-stop">{stop}</span>
+              <span className="swatch-hex">{hex.replace("#", "").toUpperCase()}</span>
+              <span className="swatch-apca">
+                <i style={{ background: "#ffffff", opacity: lcWhite >= 60 ? 1 : 0.22 }} />
+                <i style={{ background: "#000000", opacity: lcBlack >= 60 ? 1 : 0.22 }} />
+              </span>
+            </button>
+          );
+        })}
       </div>
     </header>
   );

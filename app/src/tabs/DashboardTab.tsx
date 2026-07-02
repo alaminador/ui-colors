@@ -22,8 +22,8 @@ export function DashboardTab() {
   const [chartA, chartB, chartC] = plan.chartRoles;
 
   return (
-    <div className="dashboard" style={{ background: hex("neutral", 950), color: "#ffffff" }}>
-      <aside className="dash-side" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+    <div className="dashboard" style={{ background: "var(--ex-bg)", color: "var(--ex-ink)" }}>
+      <aside className="dash-side" style={{ borderColor: "var(--ex-line)" }}>
         <div className="dash-brand">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 4 L11 12 L3 20 Z" fill={hex("primary", 400)} /><path d="M12 4 L20 12 L12 20 Z" fill={hex("primary", 400)} /></svg>
           <div>
@@ -34,7 +34,7 @@ export function DashboardTab() {
         <nav className="dash-nav">
           <span><Icon icon={ShoppingBasket01Icon} size={15} /> Products</span>
           <span className="is-open"><Icon icon={Package01Icon} size={15} /> Orders</span>
-          <span className="dash-sub is-active" style={{ background: "rgba(255,255,255,0.08)" }}>All</span>
+          <span className="dash-sub is-active" style={{ background: "var(--ex-soft)" }}>All</span>
           <span className="dash-sub">Drafts</span>
           <span className="dash-sub">Archived</span>
           <span><Icon icon={UserMultipleIcon} size={15} /> Customers</span>
@@ -60,7 +60,7 @@ export function DashboardTab() {
             { label: "Products sold", value: "632" },
             { label: "New customers", value: "12" },
           ].map((stat) => (
-            <div key={stat.label} className="dash-stat" style={{ background: "rgba(255,255,255,0.04)" }}>
+            <div key={stat.label} className="dash-stat" style={{ background: "var(--ex-card)" }}>
               <em>{stat.label}</em>
               <strong>{stat.value}</strong>
             </div>
@@ -68,7 +68,7 @@ export function DashboardTab() {
         </div>
 
         <div className="grid grid-2">
-          <div className="dash-chart" style={{ background: "rgba(255,255,255,0.04)" }}>
+          <div className="dash-chart" style={{ background: "var(--ex-card)" }}>
             <em>Orders</em>
             <BarChart
               values={[0.55, 0.35, 0.7, 0.45, 0.85, 0.5, 0.65, 0.9]}
@@ -77,7 +77,7 @@ export function DashboardTab() {
               height={150}
             />
           </div>
-          <div className="dash-chart" style={{ background: "rgba(255,255,255,0.04)" }}>
+          <div className="dash-chart" style={{ background: "var(--ex-card)" }}>
             <em>Orders</em>
             <LineChart
               series={[
@@ -90,8 +90,8 @@ export function DashboardTab() {
           </div>
         </div>
 
-        <div className="dash-table" style={{ background: "rgba(255,255,255,0.03)" }}>
-          <div className="dash-search" style={{ background: "rgba(255,255,255,0.05)" }}><Icon icon={Search01Icon} size={14} /> Search orders…</div>
+        <div className="dash-table" style={{ background: "var(--ex-card)" }}>
+          <div className="dash-search" style={{ background: "var(--ex-soft)" }}><Icon icon={Search01Icon} size={14} /> Search orders…</div>
           <table>
             <thead>
               <tr>

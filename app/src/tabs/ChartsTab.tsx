@@ -53,7 +53,7 @@ export function ChartsTab() {
             <Donut
               segments={[
                 { color: hex("success", 500), value: 72 },
-                { color: "rgba(255,255,255,0.08)", value: 28 },
+                { color: "var(--ex-soft)", value: 28 },
               ]}
               label="72%"
               sublabel="goal reached"
@@ -74,7 +74,7 @@ export function ChartsTab() {
             ).map((row) => (
               <div key={row.role} className="state-bar">
                 <em>{row.label}</em>
-                <div style={{ background: "rgba(255,255,255,0.07)" }}>
+                <div style={{ background: "var(--ex-soft)" }}>
                   <span style={{ width: row.width, background: hex(row.role, 500) }} />
                 </div>
               </div>

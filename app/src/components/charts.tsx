@@ -8,7 +8,7 @@ interface BarChartProps {
   labelColor?: string;
 }
 
-export function BarChart({ values, colors, height = 140, gap = 10, radius = 4, labels, labelColor = "rgba(255,255,255,0.45)" }: BarChartProps) {
+export function BarChart({ values, colors, height = 140, gap = 10, radius = 4, labels, labelColor = "var(--ex-muted)" }: BarChartProps) {
   const width = 320;
   const labelSpace = labels ? 18 : 0;
   const chartHeight = height - labelSpace;
@@ -87,7 +87,7 @@ interface DonutProps {
   sublabel?: string;
 }
 
-export function Donut({ segments, size = 150, thickness = 16, label, labelColor = "#ffffff", sublabel }: DonutProps) {
+export function Donut({ segments, size = 150, thickness = 16, label, labelColor = "var(--ex-ink)", sublabel }: DonutProps) {
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
   const total = segments.reduce((sum, segment) => sum + segment.value, 0);
