@@ -1,12 +1,14 @@
 import { Add01Icon, ArrowLeft01Icon, ArrowRight01Icon, InformationCircleIcon, Loading03Icon, MinusSignIcon, MoreHorizontalIcon, PlusSignIcon, SentIcon, StarIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { Icon } from "../components/Icon";
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { Donut } from "../components/charts";
 import { contrastText } from "../lib/color";
 
 export function ShadcnTab() {
   const hex = useHex();
-  const accent = hex("primary", 500);
+  const plan = useAccentPlan();
+  const [chartA, chartB, chartC] = plan.chartRoles;
+  const accent = hex(plan.ctaRole, 500);
   const onAccent = contrastText(accent);
 
   return (
@@ -95,9 +97,9 @@ export function ShadcnTab() {
             <div className="donut-wrap">
               <Donut
                 segments={[
-                  { color: hex("primary", 400), value: 55 },
-                  { color: hex("secondary", 400), value: 30 },
-                  { color: hex("tertiary", 300), value: 15 },
+                  { color: hex(chartA, 400), value: 55 },
+                  { color: hex(chartB, plan.spread === "tight" ? 600 : 400), value: 30 },
+                  { color: hex(chartC, plan.spread === "tight" ? 800 : 300), value: 15 },
                 ]}
                 size={140}
               />

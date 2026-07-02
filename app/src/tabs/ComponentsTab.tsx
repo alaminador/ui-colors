@@ -1,8 +1,9 @@
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { contrastText } from "../lib/color";
 
 export function ComponentsTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
   const p500 = hex("primary", 500);
   const p600 = hex("primary", 600);
   const onPrimary = contrastText(p500);
@@ -94,11 +95,11 @@ export function ComponentsTab() {
             <span style={{ width: "68%", background: p500 }} />
           </div>
           <div className="progress" style={{ background: hex("neutral", 200) }}>
-            <span style={{ width: "34%", background: hex("secondary", 500) }} />
+            <span style={{ width: "34%", background: hex(plan.accentRole, 500) }} />
           </div>
           <div className="avatar-stack">
             {[300, 400, 500, 600, 700].map((stop) => (
-              <span key={stop} style={{ background: `linear-gradient(140deg, ${hex("primary", stop)}, ${hex("secondary", stop)})` }} />
+              <span key={stop} style={{ background: `linear-gradient(140deg, ${hex("primary", stop)}, ${hex(plan.accentRole, stop)})` }} />
             ))}
             <span className="avatar-more" style={{ background: hex("neutral", 200), color: hex("neutral", 700) }}>+3</span>
           </div>

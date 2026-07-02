@@ -1,11 +1,13 @@
 import { ArrowRight01Icon, ArrowUpRight01Icon, GlobeIcon, HelpCircleIcon, Home01Icon, ShoppingCart01Icon } from "@hugeicons/core-free-icons";
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { Icon } from "../components/Icon";
 import { BarChart, Donut, Sparkline } from "../components/charts";
 import { contrastText } from "../lib/color";
 
 export function CardsTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
+  const [chartA, chartB, chartC] = plan.chartRoles;
   const barColors = [hex("primary", 300), hex("primary", 500), hex("primary", 400), hex("primary", 600)];
 
   return (
@@ -134,7 +136,7 @@ export function CardsTab() {
       <div className="grid grid-4">
         <article
           className="ex-card metric-card"
-          style={{ background: `linear-gradient(150deg, ${hex("secondary", 800)}, ${hex("secondary", 950)})`, color: "#ffffff" }}
+          style={{ background: `linear-gradient(150deg, ${hex(plan.accentRole, 800)}, ${hex(plan.accentRole, 950)})`, color: "#ffffff" }}
         >
           <span className="card-label" style={{ color: "rgba(255,255,255,0.72)" }}>Customers</span>
           <strong className="metric-huge">1,553 <Icon icon={ArrowUpRight01Icon} size={26} /></strong>
@@ -153,9 +155,9 @@ export function CardsTab() {
           <span className="card-label">Categories</span>
           <ul className="cat-list">
             {[
-              { name: "Groceries", note: "9 transactions", icon: ShoppingCart01Icon, role: "primary" as const },
-              { name: "Household", note: "12 transactions", icon: Home01Icon, role: "secondary" as const },
-              { name: "Travel", note: "6 transactions", icon: GlobeIcon, role: "tertiary" as const },
+              { name: "Groceries", note: "9 transactions", icon: ShoppingCart01Icon, role: chartA },
+              { name: "Household", note: "12 transactions", icon: Home01Icon, role: chartB },
+              { name: "Travel", note: "6 transactions", icon: GlobeIcon, role: chartC },
               { name: "Other", note: "6 transactions", icon: HelpCircleIcon, role: "neutral" as const },
             ].map((cat) => (
               <li key={cat.name}>
@@ -172,9 +174,9 @@ export function CardsTab() {
 
         <article
           className="ex-card photo-card"
-          style={{ background: `linear-gradient(160deg, ${hex("tertiary", 100)}, ${hex("tertiary", 300)})`, color: hex("tertiary", 950) }}
+          style={{ background: `linear-gradient(160deg, ${hex(chartC, 100)}, ${hex(chartC, 300)})`, color: hex(chartC, 950) }}
         >
-          <div className="photo-deco" style={{ background: hex("tertiary", 400) }} />
+          <div className="photo-deco" style={{ background: hex(chartC, 400) }} />
           <h3>Create budgets</h3>
         </article>
       </div>

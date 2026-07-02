@@ -1,8 +1,9 @@
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { contrastText } from "../lib/color";
 
 export function HeadingsTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
 
   return (
     <div className="tab-stack">
@@ -34,7 +35,7 @@ export function HeadingsTab() {
           <h2
             style={{
               fontSize: 38,
-              background: `linear-gradient(90deg, ${hex("primary", 300)}, ${hex("secondary", 400)})`,
+              background: `linear-gradient(90deg, ${hex("primary", 300)}, ${hex(plan.accentRole, 400)})`,
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               color: "transparent",
@@ -42,7 +43,7 @@ export function HeadingsTab() {
           >
             Gradient headlines, tastefully.
           </h2>
-          <p style={{ color: hex("neutral", 400) }}>Primary 300 into secondary 400 — both light enough to hold contrast on near-black.</p>
+          <p style={{ color: hex("neutral", 400) }}>Primary 300 into {plan.accentRole} 400 — both light enough to hold contrast on near-black.</p>
         </article>
       </div>
 

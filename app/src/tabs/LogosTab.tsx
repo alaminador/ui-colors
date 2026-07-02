@@ -1,4 +1,4 @@
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { contrastText } from "../lib/color";
 
 function Mark({ kind, color }: { kind: string; color: string }) {
@@ -47,16 +47,18 @@ function Mark({ kind, color }: { kind: string; color: string }) {
 
 export function LogosTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
+  const [, chartB, chartC] = plan.chartRoles;
 
   const tiles = [
     { kind: "chevrons", name: "Forward", bg: "#ffffff", color: hex("primary", 600), text: hex("neutral", 900) },
     { kind: "chevrons", name: "Forward", bg: hex("primary", 600), color: "#ffffff", text: "#ffffff" },
     { kind: "flower", name: "BERRY", bg: hex("neutral", 950), color: hex("primary", 400), text: "#ffffff" },
     { kind: "flower", name: "BERRY", bg: hex("primary", 100), color: hex("primary", 700), text: hex("primary", 950) },
-    { kind: "arc", name: "Rise", bg: "#ffffff", color: hex("secondary", 500), text: hex("neutral", 900) },
-    { kind: "arc", name: "Rise", bg: hex("secondary", 800), color: hex("secondary", 200), text: "#ffffff" },
-    { kind: "hex", name: "Clarify", bg: hex("tertiary", 100), color: hex("tertiary", 600), text: hex("tertiary", 950) },
-    { kind: "grid", name: "Linky", bg: hex("neutral", 950), color: hex("tertiary", 400), text: "#ffffff" },
+    { kind: "arc", name: "Rise", bg: "#ffffff", color: hex(chartB, 500), text: hex("neutral", 900) },
+    { kind: "arc", name: "Rise", bg: hex(chartB, 800), color: hex(chartB, 200), text: "#ffffff" },
+    { kind: "hex", name: "Clarify", bg: hex(chartC, 100), color: hex(chartC, 600), text: hex(chartC, 950) },
+    { kind: "grid", name: "Linky", bg: hex("neutral", 950), color: hex(chartC, 400), text: "#ffffff" },
   ];
 
   return (

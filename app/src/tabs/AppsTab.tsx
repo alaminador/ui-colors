@@ -1,12 +1,14 @@
 import { Add01Icon, ArrowDown01Icon, ArrowUp01Icon, Briefcase01Icon, MetroIcon, ShoppingCart01Icon } from "@hugeicons/core-free-icons";
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { Icon } from "../components/Icon";
 import { BarChart, Sparkline } from "../components/charts";
 import { contrastText } from "../lib/color";
 
 export function AppsTab() {
   const hex = useHex();
-  const accent = hex("primary", 500);
+  const plan = useAccentPlan();
+  const [chartA, chartB, chartC] = plan.chartRoles;
+  const accent = hex(plan.ctaRole, 500);
   const onAccent = contrastText(accent);
 
   return (
@@ -96,9 +98,9 @@ export function AppsTab() {
             />
             <div className="stats-cats">
               {[
-                { name: "Food", value: "$820", role: "primary" as const },
-                { name: "Transport", value: "$310", role: "secondary" as const },
-                { name: "Fun", value: "$275", role: "tertiary" as const },
+                { name: "Food", value: "$820", role: chartA },
+                { name: "Transport", value: "$310", role: chartB },
+                { name: "Fun", value: "$275", role: chartC },
               ].map((cat) => (
                 <div key={cat.name} style={{ background: hex(cat.role, 50), color: hex(cat.role, 900) }}>
                   <em>{cat.name}</em>
