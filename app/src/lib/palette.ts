@@ -124,23 +124,28 @@ export const harmonyRenderOrder: HarmonyKey[] = [
 
 interface RoleConfigEntry {
   label: string;
-  mode: "seed" | "harmony" | "neutral" | "fixed";
+  mode: "seed" | "harmony" | "neutral" | "semantic";
   slot?: "secondary" | "tertiary";
-  seed?: string;
+  targetHue?: number;
+  lockable: boolean;
   kind: string;
 }
 
 export const roleConfig: Record<RoleKey, RoleConfigEntry> = {
-  primary: { label: "Primary", mode: "seed", kind: "Seed" },
-  secondary: { label: "Secondary", mode: "harmony", slot: "secondary", kind: "Generated" },
-  tertiary: { label: "Tertiary", mode: "harmony", slot: "tertiary", kind: "Generated" },
-  neutral: { label: "Neutral", mode: "neutral", kind: "Support" },
-  success: { label: "Success", mode: "fixed", seed: "#16a34a", kind: "Semantic" },
-  warning: { label: "Warning", mode: "fixed", seed: "#f59e0b", kind: "Semantic" },
-  error: { label: "Error", mode: "fixed", seed: "#dc2626", kind: "Semantic" },
+  primary: { label: "Primary", mode: "seed", lockable: false, kind: "Seed" },
+  secondary: { label: "Secondary", mode: "harmony", slot: "secondary", lockable: true, kind: "Generated" },
+  tertiary: { label: "Tertiary", mode: "harmony", slot: "tertiary", lockable: true, kind: "Generated" },
+  neutral: { label: "Neutral", mode: "neutral", lockable: true, kind: "Support" },
+  success: { label: "Success", mode: "semantic", targetHue: 142, lockable: true, kind: "Semantic" },
+  warning: { label: "Warning", mode: "semantic", targetHue: 68, lockable: true, kind: "Semantic" },
+  error: { label: "Error", mode: "semantic", targetHue: 22, lockable: true, kind: "Semantic" },
 };
 
 export const roleKeys = Object.keys(roleConfig) as RoleKey[];
+
+export function isLockable(role: RoleKey): boolean {
+  return roleConfig[role].lockable;
+}
 
 export interface Shade {
   stop: number;
@@ -294,31 +299,65 @@ function shiftSeedHex(seedHex: string, options: HarmonyShift): string {
   return rgbToHex(fitToSrgb(derived));
 }
 
-function neutralSeedHex(seedHex: string): string {
+// tint: 0 (pure gray) .. 1 (fully saturated toward brand hue). 0.5 matches the
+// original fixed tint that shipped before this was made adjustable.
+function neutralSeedHex(seedHex: string, tint: number): string {
   const seed = rgbToOklch(hexToRgb(seedHex));
+  const multiplier = tint * 0.16;
   const neutral: Oklch = {
     L: clamp(0.72 + (seed.L - 0.65) * 0.08, 0.62, 0.8),
-    C: clamp(seed.C * 0.08, 0.008, 0.028),
+    C: clamp(seed.C * multiplier, 0.004, 0.05),
     h: seed.h,
   };
   return rgbToHex(fitToSrgb(neutral));
 }
 
-function roleSeedHex(primaryHex: string, roleKey: RoleKey, harmony: HarmonyKey): string {
+// Nudges an APCA-illegible color's lightness until it's usable as a solid
+// badge/button background against both white and black text.
+function ensureApcaContrast(L: number, C: number, h: number): string {
+  let lightness = L;
+  let hex = rgbToHex(fitToSrgb({ L: lightness, C, h }));
+  for (let i = 0; i < 10; i += 1) {
+    const white = Math.abs(apcaLc(hex, "#ffffff"));
+    const black = Math.abs(apcaLc(hex, "#000000"));
+    if (Math.max(white, black) >= 60) break;
+    lightness = white > black ? clamp(lightness - 0.045, 0.28, 0.78) : clamp(lightness + 0.045, 0.28, 0.78);
+    hex = rgbToHex(fitToSrgb({ L: lightness, C, h }));
+  }
+  return hex;
+}
+
+// Status colors stay in their semantic hue family (green/amber/red) but borrow
+// the brand's chroma and lightness character, with a light pull toward the
+// primary hue so they read as part of the same system rather than defaults.
+function semanticSeedHex(primaryHex: string, targetHue: number): string {
+  const seed = rgbToOklch(hexToRgb(primaryHex));
+  const hue = normalizeHue(targetHue + signedHueShift(targetHue, seed.h) * 0.06);
+  const C = clamp(seed.C * 0.85 + 0.09, 0.09, 0.22);
+  const L = clamp(0.5 + (seed.L - 0.6) * 0.35, 0.42, 0.62);
+  return ensureApcaContrast(L, C, hue);
+}
+
+function roleSeedHex(primaryHex: string, roleKey: RoleKey, harmony: HarmonyKey, neutralTint: number): string {
   const config = roleConfig[roleKey];
   if (config.mode === "seed") return primaryHex;
-  if (config.mode === "fixed") return config.seed!;
-  if (config.mode === "neutral") return neutralSeedHex(primaryHex);
+  if (config.mode === "semantic") return semanticSeedHex(primaryHex, config.targetHue!);
+  if (config.mode === "neutral") return neutralSeedHex(primaryHex, neutralTint);
   const mode = harmonyModes[effectiveHarmonyKey(primaryHex, harmony)];
   return shiftSeedHex(primaryHex, mode[config.slot!]!);
 }
 
 export type RoleOverrides = Partial<Record<RoleKey, string>>;
 
-export function generateRolePalettes(primaryHex: string, harmony: HarmonyKey, overrides: RoleOverrides = {}): Palettes {
+export function generateRolePalettes(
+  primaryHex: string,
+  harmony: HarmonyKey,
+  overrides: RoleOverrides = {},
+  neutralTint = 0.5
+): Palettes {
   return roleKeys.reduce((accumulator, roleKey) => {
     const config = roleConfig[roleKey];
-    const seedHex = overrides[roleKey] ?? roleSeedHex(primaryHex, roleKey, harmony);
+    const seedHex = overrides[roleKey] ?? roleSeedHex(primaryHex, roleKey, harmony, neutralTint);
     const generated = generateUiColorsScale(seedHex);
     accumulator[roleKey] = {
       roleKey,
@@ -331,6 +370,26 @@ export function generateRolePalettes(primaryHex: string, harmony: HarmonyKey, ov
     };
     return accumulator;
   }, {} as Palettes);
+}
+
+// Per-harmony "role recipe" — tells example tabs which roles to lean on so the
+// generated examples visibly shift with the harmony mode, not just the hues.
+export interface AccentPlan {
+  chartRoles: RoleKey[];
+  ctaRole: RoleKey;
+  accentRole: RoleKey;
+  spread: "tight" | "wide";
+}
+
+export function accentPlan(seedHex: string, harmony: HarmonyKey): AccentPlan {
+  const key = effectiveHarmonyKey(seedHex, harmony);
+  if (key === "monochrome") {
+    return { chartRoles: ["primary", "primary", "primary"], ctaRole: "primary", accentRole: "primary", spread: "tight" };
+  }
+  if (key === "complementary" || key === "split") {
+    return { chartRoles: ["primary", "primary", "secondary"], ctaRole: "primary", accentRole: "secondary", spread: "tight" };
+  }
+  return { chartRoles: ["primary", "secondary", "tertiary"], ctaRole: "primary", accentRole: "secondary", spread: "wide" };
 }
 
 export interface InfoRow extends Shade {
@@ -359,9 +418,14 @@ export function paletteInfoRows(palette: RolePalette): InfoRow[] {
 export type ExportFormat = "CSS" | "Tailwind" | "Figma" | "Hex" | "OKLCH" | "HSL" | "RGB";
 export const exportFormats: ExportFormat[] = ["CSS", "Tailwind", "Figma", "Hex", "OKLCH", "HSL", "RGB"];
 
+export interface ExportMeta {
+  harmony: HarmonyKey;
+  lockedRoles: RoleKey[];
+}
+
 // Figma variables export — matches Figma's native .tokens.json variable export
 // (W3C design tokens draft: srgb components + alpha + hex, com.figma extensions).
-export function figmaTokens(palettes: Palettes, modeName = "Default"): string {
+export function figmaTokens(palettes: Palettes, modeName = "Default", meta?: ExportMeta): string {
   const toToken = (hex: string) => {
     const [r, g, b] = hexToRgb(hex);
     return {
@@ -392,18 +456,26 @@ export function figmaTokens(palettes: Palettes, modeName = "Default"): string {
     });
     doc[palette.roleLabel] = group;
   });
-  doc["$extensions"] = { "com.figma.modeName": modeName };
+  doc["$extensions"] = {
+    "com.figma.modeName": modeName,
+    ...(meta ? { harmony: meta.harmony, lockedRoles: meta.lockedRoles } : {}),
+  };
   return JSON.stringify(doc, null, 2);
 }
 
-export function exportText(palettes: Palettes, current: RolePalette, format: ExportFormat): string {
+export function exportText(palettes: Palettes, current: RolePalette, format: ExportFormat, meta?: ExportMeta): string {
   const allPalettes = Object.values(palettes);
   const rows = paletteInfoRows(current);
+  const metaComment = meta
+    ? `/* harmony: ${harmonyModes[meta.harmony].label}${
+        meta.lockedRoles.length ? ` · manual: ${meta.lockedRoles.map((role) => roleConfig[role].label).join(", ")}` : ""
+      } */\n`
+    : "";
   if (format === "Figma") {
-    return figmaTokens(palettes);
+    return figmaTokens(palettes, "Default", meta);
   }
   if (format === "CSS") {
-    return `:root {\n${allPalettes
+    return `${metaComment}:root {\n${allPalettes
       .map((palette) => palette.colors.map((color) => `  --color-${palette.roleKey}-${color.stop}: ${color.hex};`).join("\n"))
       .join("\n")}\n}`;
   }

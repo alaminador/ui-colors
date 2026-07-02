@@ -1,8 +1,10 @@
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { BarChart, Donut, LineChart, Sparkline } from "../components/charts";
 
 export function ChartsTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
+  const [chartA, chartB, chartC] = plan.chartRoles;
 
   return (
     <div className="tab-stack">
@@ -11,18 +13,18 @@ export function ChartsTab() {
           <span className="card-label">Bar · primary scale</span>
           <BarChart
             values={[0.4, 0.65, 0.5, 0.8, 0.6, 0.9, 0.45, 0.7]}
-            colors={[hex("primary", 300), hex("primary", 400), hex("primary", 500), hex("primary", 600)]}
+            colors={[hex(chartA, 300), hex(chartA, 400), hex(chartA, 500), hex(chartA, 600)]}
             labels={["Q1", "Q2", "Q3", "Q4", "Q1", "Q2", "Q3", "Q4"]}
             height={170}
           />
         </article>
         <article className="ex-card dark-card">
-          <span className="card-label">Line · three roles</span>
+          <span className="card-label">Line · {plan.spread === "tight" ? "tonal range" : "three roles"}</span>
           <LineChart
             series={[
-              { color: hex("primary", 400), values: [0.3, 0.5, 0.42, 0.68, 0.55, 0.8, 0.7, 0.92], fill: true },
-              { color: hex("secondary", 400), values: [0.2, 0.35, 0.3, 0.5, 0.44, 0.6, 0.52, 0.7] },
-              { color: hex("tertiary", 400), values: [0.12, 0.25, 0.18, 0.36, 0.3, 0.44, 0.38, 0.52] },
+              { color: hex(chartA, 400), values: [0.3, 0.5, 0.42, 0.68, 0.55, 0.8, 0.7, 0.92], fill: true },
+              { color: hex(chartB, plan.spread === "tight" ? 600 : 400), values: [0.2, 0.35, 0.3, 0.5, 0.44, 0.6, 0.52, 0.7] },
+              { color: hex(chartC, plan.spread === "tight" ? 800 : 400), values: [0.12, 0.25, 0.18, 0.36, 0.3, 0.44, 0.38, 0.52] },
             ]}
             height={170}
           />
@@ -35,9 +37,9 @@ export function ChartsTab() {
           <div className="donut-wrap">
             <Donut
               segments={[
-                { color: hex("primary", 400), value: 44 },
-                { color: hex("secondary", 400), value: 28 },
-                { color: hex("tertiary", 400), value: 18 },
+                { color: hex(chartA, 400), value: 44 },
+                { color: hex(chartB, plan.spread === "tight" ? 600 : 400), value: 28 },
+                { color: hex(chartC, plan.spread === "tight" ? 800 : 400), value: 18 },
                 { color: hex("neutral", 500), value: 10 },
               ]}
               label="44%"
@@ -103,16 +105,16 @@ export function ChartsTab() {
         <div className="stacked">
           {[0.9, 0.7, 0.85, 0.6, 0.95, 0.75, 0.8, 0.65, 0.9, 0.7, 0.85, 0.78].map((total, index) => (
             <div key={index} className="stack-col" style={{ height: `${total * 100}%` }}>
-              <span style={{ flex: 5, background: hex("primary", 500) }} />
-              <span style={{ flex: 3, background: hex("secondary", 400) }} />
-              <span style={{ flex: 2, background: hex("tertiary", 300) }} />
+              <span style={{ flex: 5, background: hex(chartA, 500) }} />
+              <span style={{ flex: 3, background: hex(chartB, plan.spread === "tight" ? 700 : 400) }} />
+              <span style={{ flex: 2, background: hex(chartC, plan.spread === "tight" ? 300 : 300) }} />
             </div>
           ))}
         </div>
         <div className="legend-row">
-          <span><i style={{ background: hex("primary", 500) }} />Product</span>
-          <span><i style={{ background: hex("secondary", 400) }} />Services</span>
-          <span><i style={{ background: hex("tertiary", 300) }} />Other</span>
+          <span><i style={{ background: hex(chartA, 500) }} />Product</span>
+          <span><i style={{ background: hex(chartB, plan.spread === "tight" ? 700 : 400) }} />Services</span>
+          <span><i style={{ background: hex(chartC, 300) }} />Other</span>
         </div>
       </article>
     </div>

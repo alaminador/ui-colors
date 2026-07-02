@@ -1,11 +1,12 @@
 import { Cancel01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { Icon } from "./Icon";
 import { useState } from "react";
-import { ExportFormat, Palettes, RolePalette, exportFormats, exportText } from "../lib/palette";
+import { ExportFormat, ExportMeta, Palettes, RolePalette, exportFormats, exportText } from "../lib/palette";
 
 interface ExportModalProps {
   palettes: Palettes;
   palette: RolePalette;
+  exportMeta: ExportMeta;
   onClose: () => void;
   onCopy: (text: string, label?: string) => void;
 }
@@ -16,9 +17,9 @@ const fileMeta: Partial<Record<ExportFormat, { name: string; mime: string }>> = 
   Tailwind: { name: "tailwind-colors.txt", mime: "text/plain" },
 };
 
-export function ExportModal({ palettes, palette, onClose, onCopy }: ExportModalProps) {
+export function ExportModal({ palettes, palette, exportMeta, onClose, onCopy }: ExportModalProps) {
   const [format, setFormat] = useState<ExportFormat>("CSS");
-  const text = exportText(palettes, palette, format);
+  const text = exportText(palettes, palette, format, exportMeta);
   const meta = fileMeta[format];
 
   const download = () => {

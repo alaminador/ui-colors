@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppContext } from "./context";
 import { contrastText, normalizeHex, randomHex } from "./lib/color";
-import { HarmonyKey, RoleKey, RoleOverrides, generateRolePalettes, roleKeys } from "./lib/palette";
+import { ExportMeta, HarmonyKey, RoleKey, RoleOverrides, generateRolePalettes, roleKeys } from "./lib/palette";
 import { TopNav, View } from "./components/TopNav";
 import { Sidebar, SideTab } from "./components/Sidebar";
 import { Header } from "./components/Header";
@@ -56,6 +56,8 @@ export default function App() {
   const [seedHex, setSeedHex] = useState("#4fbda1");
   const [overrides, setOverrides] = useState<RoleOverrides>({});
   const [hasSecondary, setHasSecondary] = useState(false);
+  const [hasTertiary, setHasTertiary] = useState(false);
+  const [neutralTint, setNeutralTint] = useState(0.5);
   const [harmony, setHarmony] = useState<HarmonyKey>("auto");
   const [activeRole, setActiveRole] = useState<RoleKey>("primary");
   const [sideTab, setSideTab] = useState<SideTab>("brand");
@@ -76,8 +78,13 @@ export default function App() {
   }, [theme]);
 
   const palettes = useMemo(
-    () => generateRolePalettes(seedHex, harmony, overrides),
-    [seedHex, harmony, overrides]
+    () => generateRolePalettes(seedHex, harmony, overrides, neutralTint),
+    [seedHex, harmony, overrides, neutralTint]
+  );
+
+  const exportMeta: ExportMeta = useMemo(
+    () => ({ harmony, lockedRoles: Object.keys(overrides) as RoleKey[] }),
+    [harmony, overrides]
   );
 
   const copy = useCallback(async (text: string, label = "Copied") => {
@@ -109,30 +116,39 @@ export default function App() {
       harmony,
       overrides,
       hasSecondary,
+      hasTertiary,
+      neutralTint,
       savedAt: Date.now(),
     };
     setSaved((current) => [entry, ...current]);
     setToast("Saved to My palettes");
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 1400);
-  }, [palettes, seedHex, harmony, overrides, hasSecondary]);
+  }, [palettes, seedHex, harmony, overrides, hasSecondary, hasTertiary, neutralTint]);
 
   const loadSaved = useCallback((item: SavedPalette) => {
     setSeedHex(item.seedHex);
     setHarmony(item.harmony);
     setOverrides(item.overrides);
     setHasSecondary(item.hasSecondary);
+    setHasTertiary(item.hasTertiary ?? false);
+    setNeutralTint(item.neutralTint ?? 0.5);
     setActiveRole("primary");
     setSideTab("brand");
     setView("generate");
   }, []);
 
+  // Locked (manually overridden) roles are intentionally preserved across a
+  // randomize — that's the point of locking a role to a manual color. Any
+  // role without an override simply recomputes from the new seed + harmony.
   const randomize = useCallback(() => {
     setSeedHex(randomHex());
+  }, []);
+
+  const resetRole = useCallback((role: RoleKey) => {
     setOverrides((current) => {
       const next = { ...current };
-      delete next.neutral;
-      if (next.secondary) next.secondary = randomHex();
+      delete next[role];
       return next;
     });
   }, []);
@@ -170,7 +186,7 @@ export default function App() {
   }, [modal, randomize]);
 
   return (
-    <AppContext.Provider value={{ palettes, activeRole, copy }}>
+    <AppContext.Provider value={{ palettes, activeRole, harmony, copy }}>
       <TopNav
         view={view}
         theme={theme}
@@ -188,16 +204,18 @@ export default function App() {
       <div className="app-frame" style={{ display: view === "generate" ? undefined : "none" }}>
         <Sidebar
           palettes={palettes}
+          overrides={overrides}
           activeRole={activeRole}
           sideTab={sideTab}
           harmony={harmony}
           hasSecondary={hasSecondary}
+          hasTertiary={hasTertiary}
+          neutralTint={neutralTint}
           onSideTab={setSideTab}
           onSelectRole={setActiveRole}
           onSetSeed={setSeed}
           onAddSecondary={() => {
             setHasSecondary(true);
-            setOverrides((current) => ({ ...current, secondary: randomHex() }));
             setActiveRole("secondary");
           }}
           onRemoveSecondary={() => {
@@ -209,6 +227,21 @@ export default function App() {
             });
             setActiveRole("primary");
           }}
+          onAddTertiary={() => {
+            setHasTertiary(true);
+            setActiveRole("tertiary");
+          }}
+          onRemoveTertiary={() => {
+            setHasTertiary(false);
+            setOverrides((current) => {
+              const next = { ...current };
+              delete next.tertiary;
+              return next;
+            });
+            setActiveRole("primary");
+          }}
+          onResetRole={resetRole}
+          onNeutralTint={setNeutralTint}
           onRandom={randomize}
           onHarmony={setHarmony}
         />
@@ -247,7 +280,13 @@ export default function App() {
       {modal === "matrix" && <MatrixModal palette={palettes[activeRole]} onClose={() => setModal(null)} onCopy={copy} />}
       {modal === "info" && <InfoModal palette={palettes[activeRole]} onClose={() => setModal(null)} onCopy={copy} />}
       {modal === "export" && (
-        <ExportModal palettes={palettes} palette={palettes[activeRole]} onClose={() => setModal(null)} onCopy={copy} />
+        <ExportModal
+          palettes={palettes}
+          palette={palettes[activeRole]}
+          exportMeta={exportMeta}
+          onClose={() => setModal(null)}
+          onCopy={copy}
+        />
       )}
       <div className="toast" data-show={toast ? "true" : "false"}>
         {toast ?? "Copied"}

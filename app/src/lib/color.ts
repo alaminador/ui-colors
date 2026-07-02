@@ -215,6 +215,10 @@ export function normalizeHue(hue: number): number {
   return ((hue % 360) + 360) % 360;
 }
 
+export function hueOf(hex: string): number {
+  return rgbToOklch(hexToRgb(hex)).h;
+}
+
 export function randomHex(): string {
   const hue = Math.floor(Math.random() * 360);
   const chroma = 0.12 + Math.random() * 0.18;

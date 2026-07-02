@@ -7,6 +7,8 @@ export interface SavedPalette {
   harmony: HarmonyKey;
   overrides: RoleOverrides;
   hasSecondary: boolean;
+  hasTertiary?: boolean;
+  neutralTint?: number;
   savedAt: number;
 }
 

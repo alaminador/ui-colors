@@ -1,5 +1,5 @@
 import { Package01Icon, Search01Icon, Settings01Icon, ShoppingBasket01Icon, Tag01Icon, UserMultipleIcon } from "@hugeicons/core-free-icons";
-import { useHex } from "../context";
+import { useAccentPlan, useHex } from "../context";
 import { Icon } from "../components/Icon";
 import { BarChart, LineChart } from "../components/charts";
 
@@ -18,6 +18,8 @@ const orders = [
 
 export function DashboardTab() {
   const hex = useHex();
+  const plan = useAccentPlan();
+  const [chartA, chartB, chartC] = plan.chartRoles;
 
   return (
     <div className="dashboard" style={{ background: hex("neutral", 950), color: "#ffffff" }}>
@@ -47,7 +49,7 @@ export function DashboardTab() {
           <h2>Orders</h2>
           <div>
             <button className="btn-sm btn-outline-light">Export</button>
-            <button className="btn-sm" style={{ background: hex("primary", 500), color: "#fff" }}>+ Create</button>
+            <button className="btn-sm" style={{ background: hex(plan.ctaRole, 500), color: "#fff" }}>+ Create</button>
           </div>
         </div>
 
@@ -70,7 +72,7 @@ export function DashboardTab() {
             <em>Orders</em>
             <BarChart
               values={[0.55, 0.35, 0.7, 0.45, 0.85, 0.5, 0.65, 0.9]}
-              colors={[hex("primary", 500), hex("secondary", 400), hex("primary", 300), hex("tertiary", 400)]}
+              colors={[hex(chartA, 500), hex(chartB, plan.spread === "tight" ? 600 : 400), hex(chartA, 300), hex(chartC, plan.spread === "tight" ? 800 : 400)]}
               labels={["Jan 1", "Jan 2", "Jan 3", "Jan 4", "Jan 5", "Jan 6", "Jan 7", "Jan 8"]}
               height={150}
             />
@@ -79,9 +81,9 @@ export function DashboardTab() {
             <em>Orders</em>
             <LineChart
               series={[
-                { color: hex("primary", 400), values: [0.4, 0.55, 0.45, 0.7, 0.6, 0.8, 0.72, 0.9], fill: true },
-                { color: hex("secondary", 400), values: [0.3, 0.42, 0.35, 0.52, 0.48, 0.6, 0.55, 0.68] },
-                { color: hex("tertiary", 400), values: [0.15, 0.28, 0.2, 0.38, 0.3, 0.45, 0.4, 0.55] },
+                { color: hex(chartA, 400), values: [0.4, 0.55, 0.45, 0.7, 0.6, 0.8, 0.72, 0.9], fill: true },
+                { color: hex(chartB, plan.spread === "tight" ? 600 : 400), values: [0.3, 0.42, 0.35, 0.52, 0.48, 0.6, 0.55, 0.68] },
+                { color: hex(chartC, plan.spread === "tight" ? 800 : 400), values: [0.15, 0.28, 0.2, 0.38, 0.3, 0.45, 0.4, 0.55] },
               ]}
               height={150}
             />
