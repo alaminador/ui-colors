@@ -691,6 +691,79 @@ em { font-style: normal; }
   border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 13px;
 }
 .sh-radio-card strong { font-size: 13px; display: block; margin-bottom: 3px; }
+.sh-badge {
+  display: inline-flex; align-items: center; gap: 5px; width: fit-content;
+  padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 650;
+}
+.sh-hero h2 { font-size: 21px; line-height: 1.25; letter-spacing: -0.01em; }
+.sh-hero .sh-actions button { display: inline-flex; align-items: center; gap: 6px; }
+.sh-block-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.sh-faq { display: grid; gap: 8px; }
+.sh-faq-row { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 11px 13px; }
+.sh-faq-q { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; }
+.sh-faq-row p { font-size: 12px; color: rgba(255, 255, 255, 0.55); line-height: 1.55; margin-top: 8px; }
+.sh-quote p { font-size: 13.5px; line-height: 1.55; font-style: italic; }
+.sh-avatar { width: 38px; height: 38px; border-radius: 999px; }
+.sh-cta { text-align: center; justify-items: center; border-color: transparent !important; }
+.sh-cta strong { font-size: 17px; }
+.sh-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sh-stat {
+  display: grid; gap: 3px; padding: 11px 13px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.sh-stat em { font-size: 11px; color: rgba(255, 255, 255, 0.5); }
+.sh-stat strong { font-size: 17px; }
+.sh-stat span { font-size: 11px; font-weight: 650; }
+.sh-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+.sh-cal-head { font-size: 10.5px; color: rgba(255, 255, 255, 0.4); padding: 4px 0; }
+.sh-cal-day {
+  font-size: 11.5px; padding: 6px 0; border-radius: 7px; color: rgba(255, 255, 255, 0.8);
+}
+.sh-cmd { gap: 6px !important; }
+.sh-cmd-search {
+  display: flex; align-items: center; gap: 8px; padding: 9px 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.45); margin: 0 -4px 4px;
+}
+.sh-cmd-row {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+  border-radius: 8px; font-size: 12.5px;
+}
+.sh-cmd-row kbd {
+  margin-left: auto; font-size: 10.5px; font-family: inherit; padding: 2px 7px;
+  border-radius: 5px; background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.55);
+}
+.sh-pricing { border-width: 1.5px; }
+.sh-price-head { display: flex; align-items: center; justify-content: space-between; }
+.sh-price-figure { font-size: 30px; font-weight: 750; letter-spacing: -0.02em; }
+.sh-price-figure em { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.5); font-style: normal; }
+.sh-feature-list { display: grid; gap: 8px; list-style: none; }
+.sh-feature-list li { display: flex; align-items: center; gap: 9px; font-size: 12.5px; }
+.sh-tabs { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.04); padding: 4px; border-radius: 9px; }
+.sh-tabs button { flex: 1; padding: 7px 0; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: rgba(255, 255, 255, 0.55); }
+.sh-tabs button.is-active { color: #fff; }
+.sh-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.sh-table th {
+  text-align: left; font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.45);
+  padding: 6px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sh-table td { padding: 8px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.sh-table .num { text-align: right; }
+.sh-alert {
+  display: flex; align-items: center; gap: 9px; padding: 11px 14px;
+  border-radius: 10px; font-size: 12.5px; font-weight: 600;
+}
+.sh-skel { display: block; height: 11px; border-radius: 6px; background: rgba(255, 255, 255, 0.09); }
+.sh-skel-row { display: flex; align-items: center; gap: 11px; }
+.sh-skel-row > div { flex: 1; display: grid; gap: 7px; }
+.sh-skel-avatar { width: 36px; height: 36px; border-radius: 999px; flex: none; }
+.sh-page { display: flex; align-items: center; gap: 5px; justify-content: center; }
+.sh-page button {
+  min-width: 30px; height: 30px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.sh-page span { color: rgba(255, 255, 255, 0.4); font-size: 12px; padding: 0 3px; }
 .sh-stepper { display: flex; align-items: center; gap: 6px; }
 .sh-stepper span {
   min-width: 40px; height: 32px; display: grid; place-items: center; border-radius: 7px;
