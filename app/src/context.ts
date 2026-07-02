@@ -17,9 +17,14 @@ export function useApp(): AppContextValue {
 }
 
 export function useHex() {
-  const { palettes } = useApp();
-  return (role: RoleKey, stop: number): string =>
-    palettes[role].colors.find((color) => color.stop === stop)?.hex ?? "#000000";
+  const { palettes, activeRole } = useApp();
+  // Examples always lead with the scale selected in the sidebar: the active
+  // role is swapped with "primary" so picking Secondary (or Success, etc.)
+  // repaints every example with that scale while the rest stay distinct.
+  return (role: RoleKey, stop: number): string => {
+    const resolved = role === "primary" ? activeRole : role === activeRole ? "primary" : role;
+    return palettes[resolved].colors.find((color) => color.stop === stop)?.hex ?? "#000000";
+  };
 }
 
 // Tells example tabs which roles to lean on so generated examples visibly
