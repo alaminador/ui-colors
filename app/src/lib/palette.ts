@@ -299,17 +299,62 @@ function shiftSeedHex(seedHex: string, options: HarmonyShift): string {
   return rgbToHex(fitToSrgb(derived));
 }
 
-// tint: 0 (pure gray) .. 1 (fully saturated toward brand hue). 0.5 matches the
-// original fixed tint that shipped before this was made adjustable.
+// tint: 0 (pure gray) .. 1 (a clearly tinted gray, Slate/Stone-strength). The
+// resulting chroma never exceeds NEUTRAL_MAX_CHROMA, so the neutral seed always
+// stays a gray, never a muted brand color.
 function neutralSeedHex(seedHex: string, tint: number): string {
   const seed = rgbToOklch(hexToRgb(seedHex));
-  const multiplier = tint * 0.16;
   const neutral: Oklch = {
     L: clamp(0.72 + (seed.L - 0.65) * 0.08, 0.62, 0.8),
-    C: clamp(seed.C * multiplier, 0.004, 0.05),
+    C: clamp(seed.C * tint * 0.3, 0, NEUTRAL_MAX_CHROMA),
     h: seed.h,
   };
   return rgbToHex(fitToSrgb(neutral));
+}
+
+// Tailwind Slate tops out around C 0.04 in OKLCH; anything past this stops
+// reading as a neutral and starts reading as a desaturated brand color.
+const NEUTRAL_MAX_CHROMA = 0.045;
+
+const neutralLightnessRamp = tailwindReference.Neutral.map((hex) => rgbToOklch(hexToRgb(hex)).L);
+// Tint is gentle at the paper-white end and fullest through the mid/dark
+// stops, mirroring how Slate/Stone distribute their color.
+const neutralChromaCurve = [0.35, 0.45, 0.6, 0.75, 0.9, 1, 1, 1, 0.95, 0.9, 0.8];
+
+function neutralFamilyName(C: number, h: number): string {
+  if (C < 0.006) return "Neutral";
+  if (h < 20) return "Mauve";
+  if (h < 55) return "Taupe";
+  if (h < 100) return "Stone";
+  if (h < 150) return "Olive";
+  if (h < 220) return "Mist";
+  if (h < 290) return "Slate";
+  return "Mauve";
+}
+
+// The neutral role never goes through the uicolors family matcher: a tinted
+// gray can sit above that matcher's saturation threshold, get matched against
+// a colorful family (Blue, Teal, ...) and come back as a colored ramp. Instead
+// the scale is built directly — Tailwind Neutral lightness per stop, the
+// seed's hue, and hard-capped chroma — so it can only ever be a gray family
+// (Slate, Stone, Taupe, Mauve, Mist, Olive) or a shade between them.
+export function generateNeutralScale(seedHex: string): { name: string; anchor: number; colors: Shade[] } {
+  const seed = rgbToOklch(hexToRgb(seedHex));
+  const C = clamp(seed.C, 0, NEUTRAL_MAX_CHROMA);
+  const colors: Shade[] = stops.map((stop, index) => ({
+    stop,
+    hex: rgbToHex(fitToSrgb({ L: neutralLightnessRamp[index], C: C * neutralChromaCurve[index], h: seed.h })),
+  }));
+  let anchor: number = stops[0];
+  let bestDiff = Infinity;
+  neutralLightnessRamp.forEach((L, index) => {
+    const diff = Math.abs(L - seed.L);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      anchor = stops[index];
+    }
+  });
+  return { name: neutralFamilyName(C, seed.h), anchor, colors };
 }
 
 // Nudges an APCA-illegible color's lightness until it's usable as a solid
@@ -358,7 +403,7 @@ export function generateRolePalettes(
   return roleKeys.reduce((accumulator, roleKey) => {
     const config = roleConfig[roleKey];
     const seedHex = overrides[roleKey] ?? roleSeedHex(primaryHex, roleKey, harmony, neutralTint);
-    const generated = generateUiColorsScale(seedHex);
+    const generated = config.mode === "neutral" ? generateNeutralScale(seedHex) : generateUiColorsScale(seedHex);
     accumulator[roleKey] = {
       roleKey,
       roleLabel: config.label,
