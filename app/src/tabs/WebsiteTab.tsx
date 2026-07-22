@@ -1,5 +1,6 @@
-import { useHex } from "../context";
+import { useApp, useHex } from "../context";
 import { BarChart, Donut } from "../components/charts";
+import { Wordmark } from "../components/marks";
 import { contrastText } from "../lib/color";
 
 const faqs = [
@@ -12,6 +13,7 @@ const faqs = [
 
 export function WebsiteTab() {
   const hex = useHex();
+  const { hasSecondary } = useApp();
   const primaryBtnText = contrastText(hex("primary", 500));
 
   return (
@@ -38,7 +40,13 @@ export function WebsiteTab() {
           </p>
           <div className="hero-actions">
             <button className="btn-md" style={{ background: hex("primary", 500), color: primaryBtnText }}>Get started</button>
-            <button className="btn-md btn-outline-light">Learn more</button>
+            {hasSecondary ? (
+              <button className="btn-md" style={{ background: hex("secondary", 500), color: contrastText(hex("secondary", 500)) }}>
+                Learn more
+              </button>
+            ) : (
+              <button className="btn-md btn-outline-light">Learn more</button>
+            )}
           </div>
         </div>
         <div className="hero-visual" style={{ background: `linear-gradient(150deg, ${hex("primary", 800)}, ${hex("primary", 950)})` }}>
@@ -208,17 +216,5 @@ export function WebsiteTab() {
         </div>
       </footer>
     </div>
-  );
-}
-
-export function Wordmark({ color, dark }: { color: string; dark?: boolean }) {
-  return (
-    <span className="wordmark" style={{ color: dark ? "#111" : "#fff" }}>
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path d="M3 4 L11 12 L3 20 Z" fill={color} />
-        <path d="M12 4 L20 12 L12 20 Z" fill={color} />
-      </svg>
-      Forward
-    </span>
   );
 }

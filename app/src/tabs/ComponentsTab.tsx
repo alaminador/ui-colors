@@ -1,9 +1,10 @@
-import { useAccentPlan, useHex } from "../context";
+import { useAccentPlan, useApp, useHex } from "../context";
 import { contrastText } from "../lib/color";
 
 export function ComponentsTab() {
   const hex = useHex();
   const plan = useAccentPlan();
+  const { hasSecondary, hasTertiary } = useApp();
   const p500 = hex("primary", 500);
   const p600 = hex("primary", 600);
   const onPrimary = contrastText(p500);
@@ -14,6 +15,12 @@ export function ComponentsTab() {
         <h3>Buttons</h3>
         <div className="comp-row">
           <button className="btn-md" style={{ background: p500, color: onPrimary }}>Primary</button>
+          {hasSecondary && (
+            <button className="btn-md" style={{ background: hex("secondary", 500), color: contrastText(hex("secondary", 500)) }}>Secondary</button>
+          )}
+          {hasTertiary && (
+            <button className="btn-md" style={{ background: hex("tertiary", 500), color: contrastText(hex("tertiary", 500)) }}>Tertiary</button>
+          )}
           <button className="btn-md" style={{ background: hex("primary", 100), color: hex("primary", 900) }}>Soft</button>
           <button className="btn-md" style={{ background: "transparent", color: p500, border: `1px solid ${p500}` }}>Outline</button>
           <button className="btn-md" style={{ background: "transparent", color: hex("primary", 300) }}>Ghost</button>
@@ -27,16 +34,20 @@ export function ComponentsTab() {
       <section className="comp-section">
         <h3>Badges</h3>
         <div className="comp-row">
-          {(["primary", "secondary", "tertiary", "success", "warning", "error"] as const).map((role) => (
-            <span key={role} className="badge" style={{ background: hex(role, 100), color: hex(role, 800) }}>
-              {role}
-            </span>
-          ))}
-          {(["primary", "secondary", "success", "error"] as const).map((role) => (
-            <span key={`solid-${role}`} className="badge" style={{ background: hex(role, 600), color: "#fff" }}>
-              {role}
-            </span>
-          ))}
+          {(["primary", "secondary", "tertiary", "success", "warning", "error"] as const)
+            .filter((role) => (role === "secondary" ? hasSecondary : role === "tertiary" ? hasTertiary : true))
+            .map((role) => (
+              <span key={role} className="badge" style={{ background: hex(role, 100), color: hex(role, 800) }}>
+                {role}
+              </span>
+            ))}
+          {(["primary", "secondary", "success", "error"] as const)
+            .filter((role) => (role === "secondary" ? hasSecondary : true))
+            .map((role) => (
+              <span key={`solid-${role}`} className="badge" style={{ background: hex(role, 600), color: "#fff" }}>
+                {role}
+              </span>
+            ))}
         </div>
       </section>
 

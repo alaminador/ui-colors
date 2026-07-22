@@ -2,6 +2,7 @@ import { Package01Icon, Search01Icon, Settings01Icon, ShoppingBasket01Icon, Tag0
 import { useAccentPlan, useHex } from "../context";
 import { Icon } from "../components/Icon";
 import { BarChart, LineChart } from "../components/charts";
+import { ForwardMark } from "../components/marks";
 
 const orders = [
   { id: "#29788", date: "Today at 4:19 a.m.", status: "Shipped", customer: "Lucas Johnson", total: "$250.94" },
@@ -25,7 +26,7 @@ export function DashboardTab() {
     <div className="dashboard" style={{ background: "var(--ex-bg)", color: "var(--ex-ink)" }}>
       <aside className="dash-side" style={{ borderColor: "var(--ex-line)" }}>
         <div className="dash-brand">
-          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 4 L11 12 L3 20 Z" fill={hex("primary", 400)} /><path d="M12 4 L20 12 L12 20 Z" fill={hex("primary", 400)} /></svg>
+          <ForwardMark color={hex("primary", 400)} size={18} />
           <div>
             <strong>Forward</strong>
             <em>Premium</em>

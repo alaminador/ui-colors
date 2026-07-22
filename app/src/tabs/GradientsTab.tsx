@@ -1,5 +1,4 @@
 import { useAccentPlan, useApp, useHex } from "../context";
-import { contrastText } from "../lib/color";
 
 export function GradientsTab() {
   const hex = useHex();
@@ -61,8 +60,4 @@ export function GradientsTab() {
       </div>
     </div>
   );
-}
-
-export function contrastFor(hexValue: string): string {
-  return contrastText(hexValue);
 }

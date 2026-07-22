@@ -1,30 +1,8 @@
 import { Mail01Icon, Search01Icon, SmileIcon } from "@hugeicons/core-free-icons";
 import { Icon } from "../components/Icon";
+import { BerryMark, ForwardMark } from "../components/marks";
 import { useHex } from "../context";
 import { contrastText } from "../lib/color";
-
-function BerryMark({ color, size = 26 }: { color: string; size?: number }) {
-  const positions = [
-    [12, 4], [19, 8], [19, 16], [12, 20], [5, 16], [5, 8],
-  ];
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      {positions.map(([cx, cy], index) => (
-        <circle key={index} cx={cx} cy={cy} r="3.4" fill={color} />
-      ))}
-      <circle cx="12" cy="12" r="3.4" fill={color} />
-    </svg>
-  );
-}
-
-function ForwardMark({ color, size = 26 }: { color: string; size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      <path d="M3 4 L11 12 L3 20 Z" fill={color} />
-      <path d="M12 4 L20 12 L12 20 Z" fill={color} />
-    </svg>
-  );
-}
 
 export function BrandingTab() {
   const hex = useHex();

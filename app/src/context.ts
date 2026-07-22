@@ -5,6 +5,8 @@ export interface AppContextValue {
   palettes: Palettes;
   activeRole: RoleKey;
   harmony: HarmonyKey;
+  hasSecondary: boolean;
+  hasTertiary: boolean;
   copy: (text: string, label?: string) => void;
 }
 
@@ -17,12 +19,18 @@ export function useApp(): AppContextValue {
 }
 
 export function useHex() {
-  const { palettes, activeRole } = useApp();
+  const { palettes, activeRole, hasSecondary, hasTertiary } = useApp();
   // Examples always lead with the scale selected in the sidebar: the active
   // role is swapped with "primary" so picking Secondary (or Success, etc.)
   // repaints every example with that scale while the rest stay distinct.
+  // Scales the user hasn't added fall back to primary, so examples only ever
+  // showcase colors that actually exist in the palette.
   return (role: RoleKey, stop: number): string => {
-    const resolved = role === "primary" ? activeRole : role === activeRole ? "primary" : role;
+    let requested = role;
+    if ((requested === "secondary" && !hasSecondary) || (requested === "tertiary" && !hasTertiary)) {
+      requested = "primary";
+    }
+    const resolved = requested === "primary" ? activeRole : requested === activeRole ? "primary" : requested;
     return palettes[resolved].colors.find((color) => color.stop === stop)?.hex ?? "#000000";
   };
 }
@@ -31,6 +39,6 @@ export function useHex() {
 // shift with the harmony mode — e.g. monochromatic stays tonal on primary,
 // complementary uses the secondary sparingly, triadic spreads across all three.
 export function useAccentPlan(): AccentPlan {
-  const { palettes, harmony } = useApp();
-  return accentPlan(palettes.primary.seedHex, harmony);
+  const { palettes, harmony, hasSecondary, hasTertiary } = useApp();
+  return accentPlan(palettes.primary.seedHex, harmony, hasSecondary, hasTertiary);
 }

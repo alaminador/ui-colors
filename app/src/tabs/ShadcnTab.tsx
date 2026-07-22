@@ -17,7 +17,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "../components/Icon";
-import { useAccentPlan, useHex } from "../context";
+import { useAccentPlan, useApp, useHex } from "../context";
 import { Donut } from "../components/charts";
 import { contrastText } from "../lib/color";
 
@@ -39,6 +39,7 @@ const invoices = [
 export function ShadcnTab() {
   const hex = useHex();
   const plan = useAccentPlan();
+  const { hasSecondary } = useApp();
   const [chartA, chartB, chartC] = plan.chartRoles;
   const accent = hex(plan.ctaRole, 500);
   const onAccent = contrastText(accent);
@@ -55,7 +56,13 @@ export function ShadcnTab() {
             <em>Hundreds of blocks, one palette. Every element below is painted from your scales.</em>
             <div className="sh-actions">
               <button style={{ background: accent, color: onAccent }}>Get started <Icon icon={ArrowRight01Icon} size={13} /></button>
-              <button className="sh-outline"><Icon icon={GithubIcon} size={14} /> Star on GitHub</button>
+              {hasSecondary ? (
+                <button style={{ background: hex("secondary", 500), color: contrastText(hex("secondary", 500)) }}>
+                  <Icon icon={GithubIcon} size={14} /> Star on GitHub
+                </button>
+              ) : (
+                <button className="sh-outline"><Icon icon={GithubIcon} size={14} /> Star on GitHub</button>
+              )}
             </div>
           </div>
 

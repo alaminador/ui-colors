@@ -426,12 +426,14 @@ export interface AccentPlan {
   spread: "tight" | "wide";
 }
 
-export function accentPlan(seedHex: string, harmony: HarmonyKey): AccentPlan {
+export function accentPlan(seedHex: string, harmony: HarmonyKey, hasSecondary = true, hasTertiary = true): AccentPlan {
   const key = effectiveHarmonyKey(seedHex, harmony);
-  if (key === "monochrome") {
+  // Only scales the user actually added may appear in examples; harmony then
+  // modulates how boldly they're used within that cap.
+  if (key === "monochrome" || !hasSecondary) {
     return { chartRoles: ["primary", "primary", "primary"], ctaRole: "primary", accentRole: "primary", spread: "tight" };
   }
-  if (key === "complementary" || key === "split") {
+  if (key === "complementary" || key === "split" || !hasTertiary) {
     return { chartRoles: ["primary", "primary", "secondary"], ctaRole: "primary", accentRole: "secondary", spread: "tight" };
   }
   return { chartRoles: ["primary", "secondary", "tertiary"], ctaRole: "primary", accentRole: "secondary", spread: "wide" };

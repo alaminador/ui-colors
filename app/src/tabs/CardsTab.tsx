@@ -145,9 +145,9 @@ export function CardsTab() {
 
         <article
           className="ex-card photo-card"
-          style={{ background: `linear-gradient(160deg, ${hex("warning", 200)}, ${hex("warning", 400)})`, color: hex("warning", 950) }}
+          style={{ background: `linear-gradient(160deg, ${hex(plan.accentRole, 200)}, ${hex(plan.accentRole, 400)})`, color: hex(plan.accentRole, 950) }}
         >
-          <div className="photo-deco" style={{ background: hex("warning", 300) }} />
+          <div className="photo-deco" style={{ background: hex(plan.accentRole, 300) }} />
           <h3>Gain control</h3>
         </article>
 

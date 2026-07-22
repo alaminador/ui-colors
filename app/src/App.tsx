@@ -320,7 +320,7 @@ export default function App() {
   }, [modal, randomize, undo, redo]);
 
   return (
-    <AppContext.Provider value={{ palettes, activeRole, harmony, copy }}>
+    <AppContext.Provider value={{ palettes, activeRole, harmony, hasSecondary, hasTertiary, copy }}>
       <TopNav
         view={view}
         theme={theme}
