@@ -425,7 +425,7 @@ export interface ExportMeta {
 
 // Figma variables export — matches Figma's native .tokens.json variable export
 // (W3C design tokens draft: srgb components + alpha + hex, com.figma extensions).
-export function figmaTokens(palettes: Palettes, modeName = "Default", meta?: ExportMeta): string {
+export function figmaTokens(palettes: Partial<Palettes>, modeName = "Default", meta?: ExportMeta): string {
   const toToken = (hex: string) => {
     const [r, g, b] = hexToRgb(hex);
     return {
@@ -450,6 +450,7 @@ export function figmaTokens(palettes: Palettes, modeName = "Default", meta?: Exp
     },
   };
   Object.values(palettes).forEach((palette) => {
+    if (!palette) return;
     const group: Record<string, unknown> = {};
     palette.colors.forEach(({ stop, hex }) => {
       group[String(stop)] = toToken(hex);
@@ -463,8 +464,8 @@ export function figmaTokens(palettes: Palettes, modeName = "Default", meta?: Exp
   return JSON.stringify(doc, null, 2);
 }
 
-export function exportText(palettes: Palettes, current: RolePalette, format: ExportFormat, meta?: ExportMeta): string {
-  const allPalettes = Object.values(palettes);
+export function exportText(palettes: Partial<Palettes>, current: RolePalette, format: ExportFormat, meta?: ExportMeta): string {
+  const allPalettes = Object.values(palettes).filter((palette): palette is RolePalette => Boolean(palette));
   const rows = paletteInfoRows(current);
   const metaComment = meta
     ? `/* harmony: ${harmonyModes[meta.harmony].label}${

@@ -3,7 +3,7 @@ import { Moon02Icon, Redo02Icon, Sun02Icon, Undo02Icon } from "@hugeicons/core-f
 import { AppContext } from "./context";
 import { Icon } from "./components/Icon";
 import { contrastText, normalizeHex, randomHex } from "./lib/color";
-import { ExportMeta, HarmonyKey, RoleKey, RoleOverrides, generateRolePalettes, roleKeys } from "./lib/palette";
+import { ExportMeta, HarmonyKey, Palettes, RoleKey, RoleOverrides, generateRolePalettes, roleKeys } from "./lib/palette";
 import { TopNav, View } from "./components/TopNav";
 import { Sidebar, SideTab } from "./components/Sidebar";
 import { Header } from "./components/Header";
@@ -137,6 +137,15 @@ export default function App() {
     () => generateRolePalettes(seedHex, harmony, overrides, neutralTint),
     [seedHex, harmony, overrides, neutralTint]
   );
+
+  // Export only the roles the user actually added — secondary/tertiary stay
+  // out of every export format until their toggle is on.
+  const exportPalettes = useMemo(() => {
+    const next: Partial<Palettes> = { ...palettes };
+    if (!hasSecondary) delete next.secondary;
+    if (!hasTertiary) delete next.tertiary;
+    return next;
+  }, [palettes, hasSecondary, hasTertiary]);
 
   const exportMeta: ExportMeta = useMemo(
     () => ({ harmony, lockedRoles: Object.keys(overrides) as RoleKey[] }),
@@ -442,7 +451,7 @@ export default function App() {
       {modal === "info" && <InfoModal palette={palettes[activeRole]} onClose={() => setModal(null)} onCopy={copy} />}
       {modal === "export" && (
         <ExportModal
-          palettes={palettes}
+          palettes={exportPalettes}
           palette={palettes[activeRole]}
           exportMeta={exportMeta}
           onClose={() => setModal(null)}

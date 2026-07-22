@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ExportFormat, ExportMeta, Palettes, RolePalette, exportFormats, exportText } from "../lib/palette";
 
 interface ExportModalProps {
-  palettes: Palettes;
+  palettes: Partial<Palettes>;
   palette: RolePalette;
   exportMeta: ExportMeta;
   onClose: () => void;
