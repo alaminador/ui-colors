@@ -4,6 +4,7 @@ import { AppContext } from "./context";
 import { Icon } from "./components/Icon";
 import { contrastText, normalizeHex, randomHex } from "./lib/color";
 import { ExportMeta, HarmonyKey, Palettes, RoleKey, RoleOverrides, generateRolePalettes, roleKeys } from "./lib/palette";
+import { Adjustments, applyAdjustments, defaultAdjustments } from "./lib/adjustments";
 import { TopNav, View } from "./components/TopNav";
 import { Sidebar, SideTab } from "./components/Sidebar";
 import { Header } from "./components/Header";
@@ -79,6 +80,7 @@ interface HistorySnapshot {
   hasTertiary: boolean;
   harmony: HarmonyKey;
   neutralTint: number;
+  adjustments: Adjustments;
 }
 
 export default function App() {
@@ -87,6 +89,7 @@ export default function App() {
   const [hasSecondary, setHasSecondary] = useState(false);
   const [hasTertiary, setHasTertiary] = useState(false);
   const [neutralTint, setNeutralTint] = useState(0.5);
+  const [adjustments, setAdjustments] = useState<Adjustments>(defaultAdjustments);
   const [harmony, setHarmony] = useState<HarmonyKey>("auto");
   const [exTheme, setExTheme] = useState<"dark" | "light">("dark");
   const [cvd, setCvd] = useState<CvdKey>("none");
@@ -101,8 +104,8 @@ export default function App() {
   const toastTimer = useRef<number>();
 
   // --- undo/redo history over the palette-defining state ---
-  const stateRef = useRef<HistorySnapshot>({ seedHex, overrides, hasSecondary, hasTertiary, harmony, neutralTint });
-  stateRef.current = { seedHex, overrides, hasSecondary, hasTertiary, harmony, neutralTint };
+  const stateRef = useRef<HistorySnapshot>({ seedHex, overrides, hasSecondary, hasTertiary, harmony, neutralTint, adjustments });
+  stateRef.current = { seedHex, overrides, hasSecondary, hasTertiary, harmony, neutralTint, adjustments };
   const historyRef = useRef<{ past: HistorySnapshot[]; future: HistorySnapshot[] }>({ past: [], future: [] });
   const lastPush = useRef(0);
 
@@ -123,6 +126,7 @@ export default function App() {
     setHasTertiary(snapshot.hasTertiary);
     setHarmony(snapshot.harmony);
     setNeutralTint(snapshot.neutralTint);
+    setAdjustments(snapshot.adjustments);
   }, []);
 
   useEffect(() => {
@@ -134,8 +138,8 @@ export default function App() {
   }, [theme]);
 
   const palettes = useMemo(
-    () => generateRolePalettes(seedHex, harmony, overrides, neutralTint),
-    [seedHex, harmony, overrides, neutralTint]
+    () => applyAdjustments(generateRolePalettes(seedHex, harmony, overrides, neutralTint), adjustments),
+    [seedHex, harmony, overrides, neutralTint, adjustments]
   );
 
   // Export only the roles the user actually added — secondary/tertiary stay
@@ -184,13 +188,14 @@ export default function App() {
       hasSecondary,
       hasTertiary,
       neutralTint,
+      adjustments,
       savedAt: Date.now(),
     };
     setSaved((current) => [entry, ...current]);
     setToast("Saved to My palettes");
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 1400);
-  }, [palettes, seedHex, harmony, overrides, hasSecondary, hasTertiary, neutralTint]);
+  }, [palettes, seedHex, harmony, overrides, hasSecondary, hasTertiary, neutralTint, adjustments]);
 
   const loadSaved = useCallback((item: SavedPalette) => {
     pushHistory();
@@ -200,6 +205,7 @@ export default function App() {
     setHasSecondary(item.hasSecondary);
     setHasTertiary(item.hasTertiary ?? false);
     setNeutralTint(item.neutralTint ?? 0.5);
+    setAdjustments(item.adjustments ?? defaultAdjustments);
     setActiveRole("primary");
     setSideTab("brand");
     setView("generate");
@@ -387,6 +393,15 @@ export default function App() {
           onHarmony={(key) => {
             pushHistory();
             setHarmony(key);
+          }}
+          adjustments={adjustments}
+          onAdjust={(next) => {
+            pushHistory();
+            setAdjustments(next);
+          }}
+          onResetAdjust={() => {
+            pushHistory();
+            setAdjustments(defaultAdjustments);
           }}
         />
         <main className="main-area">

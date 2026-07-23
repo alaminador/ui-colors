@@ -1,3 +1,4 @@
+import { Adjustments } from "./adjustments";
 import { HarmonyKey, RoleOverrides } from "./palette";
 
 export interface SavedPalette {
@@ -9,6 +10,7 @@ export interface SavedPalette {
   hasSecondary: boolean;
   hasTertiary?: boolean;
   neutralTint?: number;
+  adjustments?: Adjustments;
   savedAt: number;
 }
 

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useAccentPlan, useApp, useHex } from "../context";
+import { GradientEditor, GradientStop, GradientType } from "../components/controls/GradientEditor";
 
 export function GradientsTab() {
   const hex = useHex();
@@ -6,6 +8,27 @@ export function GradientsTab() {
   const plan = useAccentPlan();
   const [chartA, chartB, chartC] = plan.chartRoles;
   const roleLabel = { primary: "Primary", secondary: "Secondary", tertiary: "Tertiary" } as const;
+
+  // Interactive builder state — seeded from the current scale so it always
+  // opens on a valid, on-brand gradient.
+  const [type, setType] = useState<GradientType>("linear");
+  const [angle, setAngle] = useState(140);
+  const [stops, setStops] = useState<GradientStop[]>([
+    { id: "a", color: hex("primary", 300), pos: 0 },
+    { id: "b", color: hex("primary", 700), pos: 100 },
+  ]);
+
+  // Palette swatches offered for recoloring stops — deduped so a harmony where
+  // the accent role collapses onto primary doesn't show the same chip twice.
+  const swatchStops = [200, 400, 600, 800];
+  const swatches = Array.from(
+    new Set([
+      ...swatchStops.map((s) => hex("primary", s)),
+      ...swatchStops.map((s) => hex(plan.accentRole, s)),
+      hex("neutral", 200),
+      hex("neutral", 700),
+    ])
+  );
 
   const gradients = [
     { name: "Soft rise", css: `linear-gradient(140deg, ${hex("primary", 100)}, ${hex("primary", 400)})`, text: hex("primary", 950) },
@@ -44,7 +67,26 @@ export function GradientsTab() {
 
   return (
     <div className="tab-stack">
-      <p className="tab-note">Click any tile to copy its CSS.</p>
+      <section className="ge-panel">
+        <div className="ge-panel-head">
+          <h3>Gradient builder</h3>
+          <span>Drag stops, pick palette colors, copy the CSS.</span>
+        </div>
+        <GradientEditor
+          stops={stops}
+          type={type}
+          angle={angle}
+          swatches={swatches}
+          onChange={(next) => {
+            setStops(next.stops);
+            setType(next.type);
+            setAngle(next.angle);
+          }}
+          onCopy={(text) => copy(text, "Gradient CSS copied")}
+        />
+      </section>
+
+      <p className="tab-note">Presets — click any tile to copy its CSS.</p>
       <div className="grid grid-3">
         {gradients.map((gradient) => (
           <button

@@ -8,9 +8,12 @@ import {
   SquareLock02Icon,
 } from "@hugeicons/core-free-icons";
 import { HarmonyKey, RoleKey, Palettes, RoleOverrides, harmonyModes, harmonyRenderOrder } from "../lib/palette";
+import { Adjustments, adjustmentsActive } from "../lib/adjustments";
 import { hueOf } from "../lib/color";
 import { ColorField, ColorFormat, colorFormats } from "./ColorField";
 import { HueWheel } from "./HueWheel";
+import { Slider, RangeSlider } from "./controls/Slider";
+import { CurveEditor } from "./controls/CurveEditor";
 import { Icon } from "./Icon";
 
 export type SideTab = "brand" | "neutral" | "status";
@@ -35,6 +38,9 @@ interface SidebarProps {
   onNeutralTint: (value: number) => void;
   onRandom: () => void;
   onHarmony: (key: HarmonyKey) => void;
+  adjustments: Adjustments;
+  onAdjust: (next: Adjustments) => void;
+  onResetAdjust: () => void;
 }
 
 function LockBadge({ locked, onReset }: { locked: boolean; onReset: () => void }) {
@@ -72,9 +78,17 @@ export function Sidebar({
   onNeutralTint,
   onRandom,
   onHarmony,
+  adjustments,
+  onAdjust,
+  onResetAdjust,
 }: SidebarProps) {
   const [harmonyOpen, setHarmonyOpen] = useState(false);
+  const [tuneOpen, setTuneOpen] = useState(false);
   const [format, setFormat] = useState<ColorFormat>("HEX");
+  const tuned = adjustmentsActive(adjustments);
+  const set = (patch: Partial<Adjustments>) => onAdjust({ ...adjustments, ...patch });
+  const primarySeed = palettes.primary.seedHex;
+  const toneRamp = `linear-gradient(90deg, ${palettes.primary.colors[palettes.primary.colors.length - 1].hex}, ${palettes.primary.colors[0].hex})`;
 
   const cycleFormat = () => {
     const index = colorFormats.indexOf(format);
@@ -200,6 +214,60 @@ export function Sidebar({
               </p>
             </div>
           )}
+
+          <button className="harmony-trigger-row" onClick={() => setTuneOpen((open) => !open)}>
+            Fine-tune scale <strong>{tuned ? "adjusted" : "default"}</strong>
+          </button>
+          {tuneOpen && (
+            <div className="tc-tune-panel">
+              <div className="tc-tune-head">
+                <span className="side-label side-label-sm">Tone curve</span>
+                {tuned && (
+                  <button className="tc-reset" onClick={onResetAdjust}>Reset</button>
+                )}
+              </div>
+              <CurveEditor
+                cx={adjustments.curveX}
+                cy={adjustments.curveY}
+                rampFill={toneRamp}
+                onChange={(curveX, curveY) => set({ curveX, curveY })}
+              />
+              <Slider
+                label="Hue shift"
+                value={adjustments.hueShift}
+                min={-30}
+                max={30}
+                step={1}
+                format={(v) => `${v > 0 ? "+" : ""}${v}°`}
+                trackFill={`linear-gradient(90deg, ${palettes.primary.colors[4].hex}, ${primarySeed}, ${palettes.primary.colors[6].hex})`}
+                onChange={(hueShift) => set({ hueShift })}
+              />
+              <Slider
+                label="Chroma"
+                value={adjustments.chroma}
+                min={0.4}
+                max={1.6}
+                step={0.02}
+                format={(v) => `${Math.round(v * 100)}%`}
+                onChange={(chroma) => set({ chroma })}
+              />
+              <RangeSlider
+                label="Lightness range"
+                low={adjustments.lightMin}
+                high={adjustments.lightMax}
+                min={0}
+                max={1}
+                step={0.01}
+                format={(v) => `${Math.round(v * 100)}`}
+                trackFill={toneRamp}
+                onChange={(lightMin, lightMax) => set({ lightMin, lightMax })}
+              />
+              <p className="side-note">
+                Reshapes the brand scales (primary, secondary, tertiary) after generation. Neutral and status colors keep
+                their own logic.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -219,17 +287,15 @@ export function Sidebar({
           />
           <LockBadge locked={Boolean(overrides.neutral)} onReset={() => onResetRole("neutral")} />
           {!overrides.neutral && (
-            <div className="side-tint-row">
-              <span className="side-label side-label-sm">Tint strength</span>
-              <input
-                type="range"
-                className="cf-slider"
-                min={0}
-                max={100}
-                value={Math.round(neutralTint * 100)}
-                onChange={(event) => onNeutralTint(Number(event.target.value) / 100)}
-              />
-            </div>
+            <Slider
+              label="Tint strength"
+              value={Math.round(neutralTint * 100)}
+              min={0}
+              max={100}
+              step={1}
+              format={(v) => `${v}%`}
+              onChange={(value) => onNeutralTint(value / 100)}
+            />
           )}
           <p className="side-note">Auto-tinted from your primary. Edit to lock a custom neutral.</p>
         </div>

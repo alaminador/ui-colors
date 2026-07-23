@@ -1,12 +1,65 @@
+import { useState } from "react";
 import { useAccentPlan, useHex } from "../context";
 import { contrastText } from "../lib/color";
+import { FontPicker, FontSettings, fontFamilies } from "../components/controls/FontPicker";
 
 export function HeadingsTab() {
   const hex = useHex();
   const plan = useAccentPlan();
 
+  const [font, setFont] = useState<FontSettings>({
+    family: fontFamilies[0].stack,
+    weight: 700,
+    size: 56,
+    tracking: -2,
+    textCase: "none",
+    color: hex("primary", 950),
+  });
+
+  const swatches = Array.from(
+    new Set([
+      hex("primary", 500),
+      hex("primary", 700),
+      hex("primary", 950),
+      hex(plan.accentRole, 600),
+      hex("neutral", 900),
+      hex("neutral", 950),
+    ])
+  );
+
+  const previewLight = contrastText(hex("neutral", 50)) === "#12161d";
+
   return (
     <div className="tab-stack">
+      <section className="fp-panel">
+        <div className="fp-panel-head">
+          <h3>Type playground</h3>
+          <span>Tune the headline; every value is live.</span>
+        </div>
+        <div className="fp-panel-grid">
+          <FontPicker value={font} swatches={swatches} onChange={setFont} />
+          <div className="fp-preview" style={{ background: previewLight ? "#ffffff" : hex("neutral", 950) }}>
+            <span className="fp-preview-meta" style={{ color: hex("neutral", 500) }}>
+              {fontFamilies.find((f) => f.stack === font.family)?.label} · {font.weight} · {font.size}px
+            </span>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: font.family,
+                fontWeight: font.weight,
+                fontSize: font.size,
+                letterSpacing: `${font.tracking / 100}em`,
+                textTransform: font.textCase === "none" ? "none" : font.textCase,
+                color: font.color,
+                lineHeight: 1.05,
+              }}
+            >
+              Color that feels designed.
+            </h2>
+          </div>
+        </div>
+      </section>
+
       <div className="grid grid-2">
         <article className="type-card" style={{ background: "#ffffff", color: hex("neutral", 950) }}>
           <em className="type-meta" style={{ color: hex("neutral", 500) }}>Display / 64 / 950 on white</em>

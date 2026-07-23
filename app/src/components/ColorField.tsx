@@ -1,8 +1,9 @@
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Cancel01Icon, SquareUnlock02Icon } from "@hugeicons/core-free-icons";
 import { clamp, fitToSrgb, hexToRgb, hslToRgb, normalizeHex, rgbToHex, rgbToHsl, rgbToOklch } from "../lib/color";
 import { RoleKey } from "../lib/palette";
 import { Icon } from "./Icon";
+import { Slider } from "./controls/Slider";
 
 export type ColorFormat = "HEX" | "HSL" | "OKLCH";
 export const colorFormats: ColorFormat[] = ["HEX", "HSL", "OKLCH"];
@@ -16,40 +17,6 @@ interface ColorFieldProps {
   onSelect: () => void;
   onChange: (hex: string) => void;
   onRemove?: () => void;
-}
-
-function Slider({
-  value,
-  min,
-  max,
-  step = 1,
-  background,
-  thumbColor,
-  label,
-  onChange,
-}: {
-  value: number;
-  min: number;
-  max: number;
-  step?: number;
-  background: string;
-  thumbColor: string;
-  label: string;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <input
-      type="range"
-      className="cf-slider"
-      aria-label={label}
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      style={{ background, "--thumb-color": thumbColor } as CSSProperties}
-      onChange={(event) => onChange(Number(event.target.value))}
-    />
-  );
 }
 
 function Segment({
@@ -222,8 +189,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             value={h}
             min={0}
             max={360}
-            background={hueRainbow}
-            thumbColor={`hsl(${h}, 88%, 55%)`}
+            format={(v) => `${v}°`}
+            trackFill={hueRainbow}
             onChange={(value) => setHslValue({ h: value })}
           />
           <Slider
@@ -231,8 +198,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             value={s}
             min={0}
             max={100}
-            background={`linear-gradient(to right, hsl(${h}, 0%, ${l}%), hsl(${h}, 100%, ${l}%))`}
-            thumbColor={hex}
+            format={(v) => `${v}%`}
+            trackFill={`linear-gradient(to right, hsl(${h}, 0%, ${l}%), hsl(${h}, 100%, ${l}%))`}
             onChange={(value) => setHslValue({ s: value / 100 })}
           />
           <Slider
@@ -240,8 +207,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             value={l}
             min={0}
             max={100}
-            background={`linear-gradient(to right, #000000, hsl(${h}, ${s}%, 50%), #ffffff)`}
-            thumbColor={hex}
+            format={(v) => `${v}%`}
+            trackFill={`linear-gradient(to right, #000000, hsl(${h}, ${s}%, 50%), #ffffff)`}
             onChange={(value) => setHslValue({ l: value / 100 })}
           />
         </div>
@@ -254,8 +221,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             value={okL}
             min={0}
             max={100}
-            background={`linear-gradient(to right, oklch(5% ${okC} ${okH}), oklch(55% ${okC} ${okH}), oklch(98% ${okC} ${okH}))`}
-            thumbColor={hex}
+            format={(v) => `${v}%`}
+            trackFill={`linear-gradient(to right, oklch(5% ${okC} ${okH}), oklch(55% ${okC} ${okH}), oklch(98% ${okC} ${okH}))`}
             onChange={(value) => setOkValue({ L: value / 100 })}
           />
           <Slider
@@ -264,8 +231,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             min={0}
             max={0.4}
             step={0.005}
-            background={`linear-gradient(to right, oklch(${okL}% 0 ${okH}), oklch(${okL}% 0.37 ${okH}))`}
-            thumbColor={hex}
+            format={(v) => v.toFixed(3)}
+            trackFill={`linear-gradient(to right, oklch(${okL}% 0 ${okH}), oklch(${okL}% 0.37 ${okH}))`}
             onChange={(value) => setOkValue({ C: value })}
           />
           <Slider
@@ -273,8 +240,8 @@ export function ColorField({ role, hex, active, format, locked, onSelect, onChan
             value={okH}
             min={0}
             max={360}
-            background={oklchRainbow}
-            thumbColor={`oklch(70% 0.16 ${okH})`}
+            format={(v) => `${v}°`}
+            trackFill={oklchRainbow}
             onChange={(value) => setOkValue({ h: value })}
           />
         </div>
